@@ -33,7 +33,7 @@
         <span class="nav-icon">🎓</span> Mokytis
       </button>
       <button class="nav-btn" data-tab="quiz">
-        <span class="nav-icon">🏆</span> Testas (10)
+        <span class="nav-icon">🏆</span> Testas
       </button>
       <button class="nav-btn" data-tab="tricks">
         <span class="nav-icon">💡</span> Triukai
@@ -107,7 +107,6 @@
         <div id="feedbackBox" class="feedback-box hidden">
           <span id="feedbackIcon">🎉</span>
           <span id="feedbackText">Teisingai! Šaunuolis!</span>
-          <button id="nextQuestionBtn" class="primary-btn">Kitas klausimas ➔</button>
         </div>
       </section>
     </main>
@@ -116,26 +115,68 @@
     <main id="quizTab" class="tab-content">
       <!-- Quiz Setup View -->
       <section id="quizSetup" class="quiz-card">
-        <h2>Žinių Testas 🎯</h2>
-        <p class="section-desc">Pasirink skaičius, iš kurių nori atlikti testą:</p>
+        <h2>Žinių Testo Nustatymai 🎯</h2>
         
-        <div class="quiz-selectors-grid" id="quizSelectorsGrid">
-          <!-- Checkboxes 1 to 10 generated dynamically -->
+        <!-- Selection Mode Tabs: Skaičiai vs Konkretūs veiksmai -->
+        <div class="quiz-mode-switch">
+          <button id="quizModeNumbersBtn" class="sub-tab-btn active">1. Pagal Skaičius (Staliukus)</button>
+          <button id="quizModeCustomBtn" class="sub-tab-btn">2. Konkretūs / Sunkūs Veiksmai ⚡</button>
         </div>
 
-        <div class="quiz-config-bar">
-          <button id="selectAllQuizBtn" class="small-btn">Pažymėti visus</button>
-          <button id="clearAllQuizBtn" class="small-btn">Išvalyti</button>
+        <!-- Section A: By Tables -->
+        <div id="quizByNumbersSection" class="quiz-setup-section">
+          <p class="section-desc">Pasirink skaičius, iš kurių nori atlikti testą:</p>
+          <div class="quiz-selectors-grid" id="quizSelectorsGrid">
+            <!-- Checkboxes 1 to 10 generated dynamically -->
+          </div>
+          <div class="quiz-config-bar">
+            <button id="selectAllQuizBtn" class="small-btn">Pažymėti visus</button>
+            <button id="clearAllQuizBtn" class="small-btn">Išvalyti</button>
+          </div>
         </div>
 
-        <div class="quiz-options-row">
-          <label>Klausimų skaičius:
+        <!-- Section B: Hard / Specific Combinations -->
+        <div id="quizByCustomSection" class="quiz-setup-section hidden">
+          <p class="section-desc">Pasirink konkrečius veiksmus kartojimui (pvz. sunkesnes daugybas):</p>
+          <div class="hard-pairs-grid" id="hardPairsGrid">
+            <!-- Dynamic checkboxes for tricky pairs e.g. 6x7, 7x8, 8x9 etc. -->
+          </div>
+          <div class="quiz-config-bar">
+            <button id="selectHardPairsBtn" class="small-btn">Pažymėti tik sunkiausius 🔥</button>
+            <button id="selectAllPairsBtn" class="small-btn">Pažymėti visus</button>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Additional Quiz Options -->
+        <div class="quiz-settings-grid">
+          <div class="setting-item">
+            <label for="quizCountSelect">Klausimų skaičius:</label>
             <select id="quizCountSelect" class="styled-select">
               <option value="10" selected>10 klausimų</option>
               <option value="15">15 klausimų</option>
               <option value="20">20 klausimų</option>
             </select>
-          </label>
+          </div>
+
+          <div class="setting-item">
+            <label for="quizTimerSelect">Laikas klausimui:</label>
+            <select id="quizTimerSelect" class="styled-select">
+              <option value="5" selected>5 sekundės ⏱️</option>
+              <option value="8">8 sekundės</option>
+              <option value="10">10 sekundžių</option>
+              <option value="0">Bez laiko limito ♾️</option>
+            </select>
+          </div>
+
+          <div class="setting-item">
+            <label for="quizInputTypeSelect">Atsakymo būdas:</label>
+            <select id="quizInputTypeSelect" class="styled-select">
+              <option value="choice" selected>🔘 Pasirinkimas iš 4</option>
+              <option value="keypad">⌨️ Įvesti ranka (Klaviatūra)</option>
+            </select>
+          </div>
         </div>
 
         <button id="startQuizBtn" class="primary-btn large-btn">
@@ -149,9 +190,20 @@
           <div class="progress-bar-container">
             <div id="quizProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
           </div>
-          <div class="quiz-status">
-            <span>Klausimas <strong id="quizCurrentNum">1</strong> / <span id="quizTotalNum">10</span></span>
-            <span>Taškai: <strong id="quizScoreCount">0</strong> ⭐</span>
+
+          <div class="quiz-status-row">
+            <div class="quiz-status">
+              Klausimas <strong id="quizCurrentNum">1</strong> / <span id="quizTotalNum">10</span>
+            </div>
+            
+            <!-- Countdown Timer Display -->
+            <div id="quizTimerBox" class="quiz-timer-badge">
+              ⏱️ <span id="quizTimerVal">5</span>s
+            </div>
+
+            <div class="quiz-score">
+              Taškai: <strong id="quizScoreCount">0</strong> ⭐
+            </div>
           </div>
         </div>
 
@@ -163,12 +215,33 @@
           <span id="quizAnswerPlaceholder" class="answer-box">?</span>
         </div>
 
+        <!-- Choice Mode Options -->
         <div id="quizChoices" class="choice-options">
           <!-- Quiz options rendered here -->
         </div>
 
-        <div id="quizFeedback" class="quiz-feedback hidden">
-          <span id="quizFeedbackText"></span>
+        <!-- Keypad Mode for Quiz -->
+        <div id="quizKeypadArea" class="keypad-area hidden">
+          <div class="keypad-display" id="quizKeypadDisplay">--</div>
+          <div class="keypad-grid">
+            <button class="key-btn quiz-key" data-val="1">1</button>
+            <button class="key-btn quiz-key" data-val="2">2</button>
+            <button class="key-btn quiz-key" data-val="3">3</button>
+            <button class="key-btn quiz-key" data-val="4">4</button>
+            <button class="key-btn quiz-key" data-val="5">5</button>
+            <button class="key-btn quiz-key" data-val="6">6</button>
+            <button class="key-btn quiz-key" data-val="7">7</button>
+            <button class="key-btn quiz-key" data-val="8">8</button>
+            <button class="key-btn quiz-key" data-val="9">9</button>
+            <button class="key-btn action-key quiz-key" data-val="clear">C</button>
+            <button class="key-btn quiz-key" data-val="0">0</button>
+            <button class="key-btn submit-key" id="quizKeypadSubmit">OK</button>
+          </div>
+        </div>
+
+        <div id="quizFeedback" class="quiz-feedback-box hidden">
+          <span id="quizFeedbackIcon">⏰</span>
+          <span id="quizFeedbackText">Laikas baigėsi! Teisingas atsakymas: 56</span>
         </div>
       </section>
 
